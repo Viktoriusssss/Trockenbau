@@ -18,9 +18,6 @@ namespace ModernWPFApp.ViewModels
 
         public string WindowTitle => Benutzer.Id == 0 ? "Neuen Benutzer hinzufügen" : "Benutzer bearbeiten";
 
-        public event EventHandler? SaveRequested;
-        public event EventHandler? CancelRequested;
-
         public BenutzerEditViewModel()
         {
             Benutzer = new User
@@ -101,14 +98,26 @@ namespace ModernWPFApp.ViewModels
         {
             if (IsValid)
             {
-                SaveRequested?.Invoke(this, EventArgs.Empty);
+                // Set DialogResult to true to close the window with success
+                var window = System.Windows.Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(w => w.DataContext == this);
+                if (window != null)
+                {
+                    window.DialogResult = true;
+                    window.Close();
+                }
             }
         }
 
         [RelayCommand]
         private void Cancel()
         {
-            CancelRequested?.Invoke(this, EventArgs.Empty);
+            // Set DialogResult to false to close the window with cancel
+            var window = System.Windows.Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(w => w.DataContext == this);
+            if (window != null)
+            {
+                window.DialogResult = false;
+                window.Close();
+            }
         }
     }
 }

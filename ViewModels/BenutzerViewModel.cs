@@ -82,6 +82,7 @@ namespace ModernWPFApp.ViewModels
                 // Set the owner window to center the dialog
                 editWindow.Owner = System.Windows.Application.Current.MainWindow;
                 
+                // Show dialog and get result
                 var result = editWindow.ShowDialog();
                 
                 if (result == true)
@@ -93,21 +94,21 @@ namespace ModernWPFApp.ViewModels
                     var dataService = DatabaseService.Instance;
                     var success = await dataService.AddUserAsync(newBenutzer);
                     
-                                         if (success)
-                     {
-                         // Refresh data from database
-                         await LoadSampleData();
-                         
-                         // Find and select the newly added user
-                         var addedBenutzer = Benutzer.FirstOrDefault(b => b.Username == newBenutzer.Username);
-                         if (addedBenutzer != null)
-                         {
-                             SelectedBenutzer = addedBenutzer;
-                         }
+                    if (success)
+                    {
+                        // Refresh data from database
+                        await LoadSampleData();
+                        
+                        // Find and select the newly added user
+                        var addedBenutzer = Benutzer.FirstOrDefault(b => b.Username == newBenutzer.Username);
+                        if (addedBenutzer != null)
+                        {
+                            SelectedBenutzer = addedBenutzer;
+                        }
 
-                         StatusMessage = $"Benutzer '{newBenutzer.FullName}' hinzugefügt";
-                         MessageBox.Show($"Neuer Benutzer '{newBenutzer.FullName}' wurde erfolgreich hinzugefügt.", "Erfolg", MessageBoxButton.OK, MessageBoxImage.Information);
-                     }
+                        StatusMessage = $"Benutzer '{newBenutzer.FullName}' hinzugefügt";
+                        MessageBox.Show($"Neuer Benutzer '{newBenutzer.FullName}' wurde erfolgreich hinzugefügt.", "Erfolg", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                     else
                     {
                         MessageBox.Show("Fehler beim Speichern des Benutzers in der Datenbank.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -139,6 +140,7 @@ namespace ModernWPFApp.ViewModels
                 // Set the owner window to center the dialog
                 editWindow.Owner = System.Windows.Application.Current.MainWindow;
                 
+                // Show dialog and get result
                 var result = editWindow.ShowDialog();
                 
                 if (result == true)
@@ -150,21 +152,21 @@ namespace ModernWPFApp.ViewModels
                     var dataService = DatabaseService.Instance;
                     var success = await dataService.UpdateUserAsync(updatedBenutzer);
                     
-                                         if (success)
-                     {
-                         // Refresh data from database
-                         await LoadSampleData();
-                         
-                         // Find and select the updated user
-                         var updatedBenutzerFromDb = Benutzer.FirstOrDefault(b => b.Id == updatedBenutzer.Id);
-                         if (updatedBenutzerFromDb != null)
-                         {
-                             SelectedBenutzer = updatedBenutzerFromDb;
-                         }
+                    if (success)
+                    {
+                        // Refresh data from database
+                        await LoadSampleData();
+                        
+                        // Find and select the updated user
+                        var updatedBenutzerFromDb = Benutzer.FirstOrDefault(b => b.Id == updatedBenutzer.Id);
+                        if (updatedBenutzerFromDb != null)
+                        {
+                            SelectedBenutzer = updatedBenutzerFromDb;
+                        }
 
-                         StatusMessage = $"Benutzer '{updatedBenutzer.FullName}' aktualisiert";
-                         MessageBox.Show($"Benutzer '{updatedBenutzer.FullName}' wurde erfolgreich aktualisiert.", "Erfolg", MessageBoxButton.OK, MessageBoxImage.Information);
-                     }
+                        StatusMessage = $"Benutzer '{updatedBenutzer.FullName}' aktualisiert";
+                        MessageBox.Show($"Benutzer '{updatedBenutzer.FullName}' wurde erfolgreich aktualisiert.", "Erfolg", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
                     else
                     {
                         MessageBox.Show("Fehler beim Aktualisieren des Benutzers in der Datenbank.", "Fehler", MessageBoxButton.OK, MessageBoxImage.Error);
