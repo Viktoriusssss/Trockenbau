@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+                     <ItemGroup>
+             <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
+             <PackageReference Include="MaterialDesignColors" Version="2.1.4" />
+             <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+             <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+             <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.25" />
+             <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.25" />
+         </ItemGroup>
+
+</Project>

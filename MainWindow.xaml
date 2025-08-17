@@ -1,0 +1,244 @@
+<Window x:Class="ModernWPFApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:views="clr-namespace:ModernWPFApp.Views"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="Bauverwaltungssystem"
+        Height="800"
+        Width="1200"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
+
+    <materialDesign:DialogHost Identifier="RootDialog">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header/Toolbar -->
+            <materialDesign:ColorZone Grid.Row="0"
+                                     Padding="16"
+                                     materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                     Mode="PrimaryMid">
+                <DockPanel>
+                    <!-- Left Side - App Title and User Info -->
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Left">
+                        <materialDesign:PackIcon Kind="City"
+                                               Width="32"
+                                               Height="32"
+                                               VerticalAlignment="Center"
+                                               Foreground="White"/>
+                        <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock Text="Bauverwaltungssystem"
+                                     FontSize="18"
+                                     FontWeight="Medium"
+                                     Foreground="White"/>
+                            <TextBlock Text="{Binding CurrentUser.FullName, StringFormat='Angemeldet als: {0}'}"
+                                     FontSize="12"
+                                     Foreground="White"
+                                     Opacity="0.7"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Right Side - Actions -->
+                    <StackPanel Orientation="Horizontal" DockPanel.Dock="Right">
+                        
+                        <!-- Refresh Button -->
+                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                Command="{Binding RefreshDataCommand}"
+                                ToolTip="Daten aktualisieren">
+                            <materialDesign:PackIcon Kind="Refresh" Width="20" Height="20"/>
+                        </Button>
+
+                        <!-- Settings Button -->
+                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                Command="{Binding ShowSettingsCommand}"
+                                ToolTip="Einstellungen">
+                            <materialDesign:PackIcon Kind="Settings" Width="20" Height="20"/>
+                        </Button>
+
+                        <!-- User Profile Button -->
+                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                Command="{Binding ShowUserProfileCommand}"
+                                ToolTip="Benutzerprofil">
+                            <materialDesign:PackIcon Kind="Account" Width="20" Height="20"/>
+                        </Button>
+
+                        <!-- Help Button -->
+                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                Command="{Binding ShowHelpCommand}"
+                                ToolTip="Hilfe">
+                            <materialDesign:PackIcon Kind="Help" Width="20" Height="20"/>
+                        </Button>
+
+                        <!-- Logout Button -->
+                        <Button Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                Command="{Binding LogoutCommand}"
+                                ToolTip="Abmelden">
+                            <materialDesign:PackIcon Kind="Logout" Width="20" Height="20"/>
+                        </Button>
+
+                    </StackPanel>
+
+                    <!-- Center - Search (if needed) -->
+                    <Grid Margin="40,0">
+                        <!-- Reserved for search functionality -->
+                    </Grid>
+
+                </DockPanel>
+            </materialDesign:ColorZone>
+
+            <!-- Main Content Area -->
+            <Grid Grid.Row="1">
+                <TabControl SelectedIndex="{Binding SelectedTabIndex}"
+                           Style="{StaticResource MaterialDesignTabControl}"
+                           materialDesign:ColorZoneAssist.Mode="PrimaryMid">
+                    
+                    <!-- Kunden Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="AccountMultiple" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Kunden"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:KundenView/>
+                    </TabItem>
+
+                    <!-- Benutzer Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="AccountGroup" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Benutzer"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:BenutzerView/>
+                    </TabItem>
+
+                    <!-- Baustellen Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="City" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Baustellen"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:BaustellenView/>
+                    </TabItem>
+
+                    <!-- Angebote Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="FileDocument" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Angebote"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:AngeboteView/>
+                    </TabItem>
+
+                    <!-- Aufmaß Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Ruler" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Aufmaß"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:AufmassView/>
+                    </TabItem>
+
+                    <!-- Rechnungen Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Receipt" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Rechnungen"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:RechnungenView/>
+                    </TabItem>
+
+                    <!-- LV Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="FormatListNumbered" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="LV"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:LVView/>
+                    </TabItem>
+
+                    <!-- Über Tab -->
+                    <TabItem>
+                        <TabItem.Header>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="Information" 
+                                                       Width="16" 
+                                                       Height="16" 
+                                                       Margin="0,0,8,0"/>
+                                <TextBlock Text="Über"/>
+                            </StackPanel>
+                        </TabItem.Header>
+                        <views:AboutView/>
+                    </TabItem>
+
+                </TabControl>
+            </Grid>
+
+            <!-- Status Bar -->
+            <materialDesign:ColorZone Grid.Row="2"
+                                     Padding="8"
+                                     Mode="PrimaryDark">
+                <DockPanel>
+                    <TextBlock Text="{Binding StatusMessage}"
+                              Foreground="White"
+                              VerticalAlignment="Center"/>
+                    
+                    <StackPanel Orientation="Horizontal" 
+                               DockPanel.Dock="Right"
+                               HorizontalAlignment="Right">
+                        <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='dd.MM.yyyy HH:mm'}"
+                                  Foreground="White"
+                                  VerticalAlignment="Center"
+                                  Margin="16,0,0,0"/>
+                    </StackPanel>
+                </DockPanel>
+            </materialDesign:ColorZone>
+
+        </Grid>
+    </materialDesign:DialogHost>
+</Window>

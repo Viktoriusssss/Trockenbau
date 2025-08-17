@@ -1,0 +1,104 @@
+<Window x:Class="ModernWPFApp.Views.BenutzerEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:models="clr-namespace:ModernWPFApp.Models"
+        Title="{Binding WindowTitle}"
+        Height="600"
+        Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource MaterialDesignPaper}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <materialDesign:Card Grid.Row="0" Margin="0,0,0,20" Padding="16">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="AccountEdit" 
+                                       Width="24" 
+                                       Height="24" 
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                <TextBlock Text="{Binding WindowTitle}" 
+                          FontSize="18" 
+                          FontWeight="Medium" 
+                          VerticalAlignment="Center"
+                          Margin="8,0,0,0"/>
+            </StackPanel>
+        </materialDesign:Card>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Benutzername -->
+                <TextBox materialDesign:HintAssist.Hint="Benutzername * (erforderlich)"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        Margin="0,0,0,16"
+                        Text="{Binding Benutzer.Username, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Vorname -->
+                <TextBox materialDesign:HintAssist.Hint="Vorname * (erforderlich)"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        Margin="0,0,0,16"
+                        Text="{Binding Benutzer.FirstName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Nachname -->
+                <TextBox materialDesign:HintAssist.Hint="Nachname * (erforderlich)"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        Margin="0,0,0,16"
+                        Text="{Binding Benutzer.LastName, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Email -->
+                <TextBox materialDesign:HintAssist.Hint="Email * (erforderlich)"
+                        Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                        Margin="0,0,0,16"
+                        Text="{Binding Benutzer.Email, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Benutzerrolle -->
+                <ComboBox materialDesign:HintAssist.Hint="Benutzerrolle * (erforderlich)"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          Margin="0,0,0,16"
+                          SelectedItem="{Binding Benutzer.Role}">
+                    <models:UserRole>Administrator</models:UserRole>
+                    <models:UserRole>Manager</models:UserRole>
+                    <models:UserRole>Employee</models:UserRole>
+                    <models:UserRole>Guest</models:UserRole>
+                </ComboBox>
+
+                <!-- Aktiver Benutzer -->
+                <CheckBox Content="Benutzer ist aktiv"
+                          IsChecked="{Binding Benutzer.IsActive}"
+                          Margin="0,0,0,16"
+                          Style="{StaticResource MaterialDesignCheckBox}"/>
+
+                <!-- Error Message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                          Foreground="Red"
+                          TextWrapping="Wrap"
+                          Margin="0,0,0,16"
+                          Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <materialDesign:Card Grid.Row="2" Margin="0,20,0,0" Padding="16">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="ABBRECHEN"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        Margin="0,0,8,0"
+                        Command="{Binding CancelCommand}"/>
+
+                <Button Content="SPEICHERN"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        Command="{Binding SaveCommand}"
+                        IsEnabled="{Binding IsValid}"/>
+            </StackPanel>
+        </materialDesign:Card>
+    </Grid>
+</Window>

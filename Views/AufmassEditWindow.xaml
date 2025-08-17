@@ -1,0 +1,129 @@
+<Window x:Class="ModernWPFApp.Views.AufmassEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:models="clr-namespace:ModernWPFApp.Models"
+        Title="{Binding WindowTitle}"
+        Height="700" Width="600"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" 
+                Background="{DynamicResource PrimaryHueLightBrush}"
+                CornerRadius="4"
+                Padding="16,12"
+                Margin="0,0,0,16">
+            <StackPanel Orientation="Horizontal">
+                <materialDesign:PackIcon Kind="Ruler" 
+                                       Width="24" 
+                                       Height="24" 
+                                       VerticalAlignment="Center"
+                                       Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+                <TextBlock Text="{Binding WindowTitle}" 
+                          FontSize="18" 
+                          FontWeight="Medium" 
+                          VerticalAlignment="Center"
+                          Margin="8,0,0,0"
+                          Foreground="{DynamicResource PrimaryHueMidBrush}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Nummer -->
+                <TextBox materialDesign:HintAssist.Hint="Nummer * (erforderlich)"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,16"
+                         Text="{Binding Aufmass.Nummer, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Titel -->
+                <TextBox materialDesign:HintAssist.Hint="Titel * (erforderlich)"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,16"
+                         Text="{Binding Aufmass.Titel, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <!-- Beschreibung -->
+                <TextBox materialDesign:HintAssist.Hint="Beschreibung"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,16"
+                         Text="{Binding Aufmass.Beschreibung, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Height="80"
+                         VerticalScrollBarVisibility="Auto"/>
+
+                <!-- Baustelle Selection -->
+                <ComboBox materialDesign:HintAssist.Hint="Baustelle * (erforderlich)"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          Margin="0,0,0,16"
+                          ItemsSource="{Binding Baustellen}"
+                          SelectedValue="{Binding Aufmass.BaustelleId}"
+                          SelectedValuePath="Id"
+                          DisplayMemberPath="Name"/>
+
+
+
+                <!-- Aufmass Date -->
+                <DatePicker materialDesign:HintAssist.Hint="Aufmaß am"
+                           Style="{StaticResource MaterialDesignOutlinedDatePicker}"
+                           Margin="0,0,0,16"
+                           SelectedDate="{Binding Aufmass.AufmassAm}"/>
+
+                <!-- Status -->
+                <ComboBox materialDesign:HintAssist.Hint="Status"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          Margin="0,0,0,16"
+                          SelectedItem="{Binding Aufmass.Status}">
+                    <models:AufmassStatus>Entwurf</models:AufmassStatus>
+                    <models:AufmassStatus>InBearbeitung</models:AufmassStatus>
+                    <models:AufmassStatus>Geprueft</models:AufmassStatus>
+                    <models:AufmassStatus>Freigegeben</models:AufmassStatus>
+                    <models:AufmassStatus>Abgerechnet</models:AufmassStatus>
+                </ComboBox>
+
+                <!-- Notizen -->
+                <TextBox materialDesign:HintAssist.Hint="Notizen"
+                         Style="{StaticResource MaterialDesignOutlinedTextBox}"
+                         Margin="0,0,0,16"
+                         Text="{Binding Aufmass.Notizen, UpdateSourceTrigger=PropertyChanged}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         Height="80"
+                         VerticalScrollBarVisibility="Auto"/>
+
+                <!-- Error Message -->
+                <TextBlock Text="{Binding ErrorMessage}"
+                          Foreground="Red"
+                          TextWrapping="Wrap"
+                          Margin="0,0,0,16"
+                          Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Margin="0,16,0,0">
+            <Button Content="ABBRECHEN"
+                    Style="{StaticResource MaterialDesignOutlinedButton}"
+                    Command="{Binding CancelCommand}"
+                    Margin="0,0,8,0"/>
+            <Button Content="SPEICHERN"
+                    Style="{StaticResource MaterialDesignRaisedButton}"
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding IsValid}"/>
+        </StackPanel>
+    </Grid>
+</Window>
