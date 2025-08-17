@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ModernWPFApp.Models;
+using ModernWPFApp.Services;
 using System.ComponentModel;
 
 namespace ModernWPFApp.ViewModels
@@ -16,7 +17,62 @@ namespace ModernWPFApp.ViewModels
         [ObservableProperty]
         private bool _isValid = false;
 
+        private string _password = string.Empty;
+        public string Password
+        {
+            get => _password;
+            set
+            {
+                _password = value;
+                OnPropertyChanged(nameof(Password));
+                ValidateBenutzer();
+            }
+        }
+
+        private string _confirmPassword = string.Empty;
+        public string ConfirmPassword
+        {
+            get => _confirmPassword;
+            set
+            {
+                _confirmPassword = value;
+                OnPropertyChanged(nameof(ConfirmPassword));
+                ValidateBenutzer();
+            }
+        }
+
         public string WindowTitle => Benutzer.Id == 0 ? "Neuen Benutzer hinzufügen" : "Benutzer bearbeiten";
+
+        public bool CanAssignSystemAdministratorRole
+        {
+            get
+            {
+                var currentUser = AuthenticationService.Instance.CurrentUser;
+                return currentUser?.Role == UserRole.SystemAdministrator;
+            }
+        }
+
+        public List<UserRole> AvailableRoles
+        {
+            get
+            {
+                var roles = new List<UserRole>
+                {
+                    UserRole.Administrator,
+                    UserRole.Manager,
+                    UserRole.Employee,
+                    UserRole.Guest
+                };
+
+                // Only SystemAdministrators can assign SystemAdministrator role
+                if (CanAssignSystemAdministratorRole)
+                {
+                    roles.Insert(0, UserRole.SystemAdministrator);
+                }
+
+                return roles;
+            }
+        }
 
         public BenutzerEditViewModel()
         {
@@ -76,6 +132,17 @@ namespace ModernWPFApp.ViewModels
             else if (!IsValidEmail(Benutzer.Email))
                 errors.Add("Email hat ein ungültiges Format");
 
+            // Password validation for new users
+            if (Benutzer.Id == 0) // New user
+            {
+                if (string.IsNullOrWhiteSpace(Password))
+                    errors.Add("Passwort ist erforderlich");
+                else if (Password.Length < 6)
+                    errors.Add("Passwort muss mindestens 6 Zeichen lang sein");
+                else if (Password != ConfirmPassword)
+                    errors.Add("Passwörter stimmen nicht überein");
+            }
+
             ErrorMessage = string.Join("\n", errors);
             IsValid = errors.Count == 0;
         }
@@ -98,6 +165,12 @@ namespace ModernWPFApp.ViewModels
         {
             if (IsValid)
             {
+                // Hash password for new users
+                if (Benutzer.Id == 0 && !string.IsNullOrWhiteSpace(Password))
+                {
+                    Benutzer.PasswordHash = HashPassword(Password);
+                }
+
                 // Set DialogResult to true to close the window with success
                 var window = System.Windows.Application.Current.Windows.OfType<System.Windows.Window>().FirstOrDefault(w => w.DataContext == this);
                 if (window != null)
@@ -106,6 +179,13 @@ namespace ModernWPFApp.ViewModels
                     window.Close();
                 }
             }
+        }
+
+        private string HashPassword(string password)
+        {
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            var hashedBytes = sha256.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            return Convert.ToBase64String(hashedBytes);
         }
 
         [RelayCommand]

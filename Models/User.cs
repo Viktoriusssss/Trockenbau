@@ -135,6 +135,7 @@ namespace ModernWPFApp.Models
 
     public enum UserRole
     {
+        SystemAdministrator,
         Administrator,
         Manager,
         Employee,

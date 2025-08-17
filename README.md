@@ -11,7 +11,7 @@ A modern WPF application for comprehensive construction project management, buil
 
 ### 🔐 **Authentication & Security**
 - **Role-based access control** with multiple user roles
-- **Secure login system** with demo accounts
+- **Secure login system** with role-based permissions
 - **User management** with administrative controls
 
 ### 📊 **Core Management Modules**
@@ -71,15 +71,11 @@ A modern WPF application for comprehensive construction project management, buil
    dotnet run
    ```
 
-## 🔑 Demo Login
+## 🔑 Login
 
-Use these demo accounts to explore the system:
+To access the system, please contact your system administrator for login credentials.
 
-| Username | Password | Role | Access Level |
-|----------|----------|------|--------------|
-| `admin` | `password` | Administrator | Full access |
-| `manager` | `password` | Manager | Management access |
-| `employee` | `password` | Employee | Limited access |
+**Note:** Only administrators can create new user accounts.
 
 ## 📁 Project Structure
 
@@ -95,8 +91,7 @@ Trockenbau/
 │   └── LVPosition.cs         # Performance catalog
 ├── 📁 Services/              # Business logic layer
 │   ├── AuthenticationService.cs
-│   ├── DatabaseService.cs
-│   └── SimpleDataService.cs
+│   └── DatabaseService.cs
 ├── 📁 ViewModels/            # MVVM ViewModels
 │   ├── LoginViewModel.cs
 │   ├── MainWindowViewModel.cs

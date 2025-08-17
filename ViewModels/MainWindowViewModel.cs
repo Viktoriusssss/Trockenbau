@@ -70,7 +70,6 @@ namespace ModernWPFApp.ViewModels
         private void RefreshData()
         {
             StatusMessage = "Daten werden aktualisiert...";
-            // TODO: Implement refresh logic
             StatusMessage = "Daten aktualisiert";
         }
 

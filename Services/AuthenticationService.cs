@@ -8,7 +8,7 @@ namespace ModernWPFApp.Services
     {
         private static AuthenticationService? _instance;
         private User? _currentUser;
-        private readonly List<User> _users;
+        private readonly DatabaseService _databaseService;
 
         public static AuthenticationService Instance => _instance ??= new AuthenticationService();
 
@@ -20,65 +20,52 @@ namespace ModernWPFApp.Services
 
         private AuthenticationService()
         {
-            _users = new List<User>();
+            _databaseService = DatabaseService.Instance;
             InitializeDefaultUsers();
         }
 
-        private void InitializeDefaultUsers()
+        private async void InitializeDefaultUsers()
         {
-            // Create default admin user
-            _users.Add(new User
+            try
             {
-                Id = 1,
-                Username = "admin",
-                Email = "admin@company.com",
-                FirstName = "System",
-                LastName = "Administrator",
-                Role = UserRole.Administrator,
-                CreatedDate = DateTime.Now,
-                IsActive = true
-            });
-
-            // Create default manager user
-            _users.Add(new User
+                // Check if admin user already exists
+                var existingUsers = await _databaseService.GetUsersAsync();
+                
+                if (!existingUsers.Any(u => u.Username == "admin"))
+                {
+                    // Create system administrator with simple credentials
+                    var adminUser = new User
+                    {
+                        Username = "admin",
+                        Email = "admin@company.com",
+                        FirstName = "System",
+                        LastName = "Administrator",
+                        Role = UserRole.SystemAdministrator,
+                        CreatedDate = DateTime.Now,
+                        IsActive = true,
+                        PasswordHash = HashPassword("admin123")
+                    };
+                    await _databaseService.AddUserAsync(adminUser);
+                }
+            }
+            catch (Exception ex)
             {
-                Id = 2,
-                Username = "manager",
-                Email = "manager@company.com",
-                FirstName = "Project",
-                LastName = "Manager",
-                Role = UserRole.Manager,
-                CreatedDate = DateTime.Now,
-                IsActive = true
-            });
-
-            // Create default employee user
-            _users.Add(new User
-            {
-                Id = 3,
-                Username = "employee",
-                Email = "employee@company.com",
-                FirstName = "Field",
-                LastName = "Employee",
-                Role = UserRole.Employee,
-                CreatedDate = DateTime.Now,
-                IsActive = true
-            });
+                System.Diagnostics.Debug.WriteLine($"Error initializing default users: {ex.Message}");
+            }
         }
 
         public async Task<LoginResult> LoginAsync(string username, string password)
         {
             try
             {
-                // Simulate async operation
-                await Task.Delay(500);
-
                 if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
                 {
                     return new LoginResult { Success = false, ErrorMessage = "Benutzername und Passwort sind erforderlich." };
                 }
 
-                var user = _users.FirstOrDefault(u => 
+                // Get all users from database
+                var users = await _databaseService.GetUsersAsync();
+                var user = users.FirstOrDefault(u => 
                     u.Username.Equals(username, StringComparison.OrdinalIgnoreCase) && 
                     u.IsActive);
 
@@ -87,9 +74,9 @@ namespace ModernWPFApp.Services
                     return new LoginResult { Success = false, ErrorMessage = "Benutzername oder Passwort ist falsch." };
                 }
 
-                // For demo purposes, we accept "password" as the password for all users
-                // In a real application, you would hash and compare passwords properly
-                if (password != "password")
+                // Verify password hash
+                var hashedPassword = HashPassword(password);
+                if (user.PasswordHash != hashedPassword)
                 {
                     return new LoginResult { Success = false, ErrorMessage = "Benutzername oder Passwort ist falsch." };
                 }
@@ -118,6 +105,7 @@ namespace ModernWPFApp.Services
 
             return _currentUser!.Role switch
             {
+                UserRole.SystemAdministrator => true,
                 UserRole.Administrator => true,
                 UserRole.Manager => permission != "SystemSettings",
                 UserRole.Employee => permission == "ViewData" || permission == "EditBasicData",
@@ -126,16 +114,29 @@ namespace ModernWPFApp.Services
             };
         }
 
-        public List<User> GetAllUsers()
+        public async Task<List<User>> GetAllUsersAsync()
         {
-            return _users.ToList();
+            var users = await _databaseService.GetUsersAsync();
+            return users.ToList();
         }
 
-        public void AddUser(User user)
+        public async Task<bool> AddUserAsync(User user)
         {
-            user.Id = _users.Any() ? _users.Max(u => u.Id) + 1 : 1;
-            user.CreatedDate = DateTime.Now;
-            _users.Add(user);
+            try
+            {
+                // Ensure password is hashed if not already
+                if (string.IsNullOrEmpty(user.PasswordHash))
+                {
+                    // Don't set a default password - this should be handled by the UI
+                    return false;
+                }
+                
+                return await _databaseService.AddUserAsync(user);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private string HashPassword(string password)

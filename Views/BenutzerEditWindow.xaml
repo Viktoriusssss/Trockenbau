@@ -60,16 +60,26 @@
                         Margin="0,0,0,16"
                         Text="{Binding Benutzer.Email, UpdateSourceTrigger=PropertyChanged}"/>
 
+                <!-- Password (only for new users) -->
+                <PasswordBox materialDesign:HintAssist.Hint="Passwort * (erforderlich für neue Benutzer)"
+                            Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                            Margin="0,0,0,16"
+                            x:Name="PasswordBox"
+                            PasswordChanged="PasswordBox_PasswordChanged"/>
+
+                <!-- Confirm Password (only for new users) -->
+                <PasswordBox materialDesign:HintAssist.Hint="Passwort bestätigen * (erforderlich für neue Benutzer)"
+                            Style="{StaticResource MaterialDesignOutlinedPasswordBox}"
+                            Margin="0,0,0,16"
+                            x:Name="ConfirmPasswordBox"
+                            PasswordChanged="ConfirmPasswordBox_PasswordChanged"/>
+
                 <!-- Benutzerrolle -->
                 <ComboBox materialDesign:HintAssist.Hint="Benutzerrolle * (erforderlich)"
                           Style="{StaticResource MaterialDesignOutlinedComboBox}"
                           Margin="0,0,0,16"
-                          SelectedItem="{Binding Benutzer.Role}">
-                    <models:UserRole>Administrator</models:UserRole>
-                    <models:UserRole>Manager</models:UserRole>
-                    <models:UserRole>Employee</models:UserRole>
-                    <models:UserRole>Guest</models:UserRole>
-                </ComboBox>
+                          ItemsSource="{Binding AvailableRoles}"
+                          SelectedItem="{Binding Benutzer.Role}"/>
 
                 <!-- Aktiver Benutzer -->
                 <CheckBox Content="Benutzer ist aktiv"

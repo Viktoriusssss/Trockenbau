@@ -33,15 +33,16 @@
                 <StackPanel DockPanel.Dock="Right" 
                            Orientation="Horizontal" 
                            HorizontalAlignment="Right">
-                                                              <Button Style="{StaticResource MaterialDesignRaisedButton}"
-                             Margin="8,0,0,0"
-                             ToolTip="Neuen Benutzer hinzufügen"
-                             Command="{Binding AddBenutzerCommand}">
-                         <StackPanel Orientation="Horizontal">
-                             <materialDesign:PackIcon Kind="Plus" Width="16" Height="16"/>
-                             <TextBlock Text="Neu" Margin="8,0,0,0"/>
-                         </StackPanel>
-                     </Button>
+                    <Button Style="{StaticResource MaterialDesignRaisedButton}"
+                            Margin="8,0,0,0"
+                            ToolTip="Neuen Benutzer hinzufügen"
+                            Command="{Binding AddBenutzerCommand}"
+                            Visibility="{Binding IsAdmin, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="Plus" Width="16" Height="16"/>
+                            <TextBlock Text="Neu" Margin="8,0,0,0"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
                 <!-- Search Box -->
@@ -340,11 +341,13 @@
                                         Style="{StaticResource MaterialDesignRaisedButton}"
                                         Command="{Binding EditBenutzerCommand}"
                                         CommandParameter="{Binding SelectedBenutzer}"
-                                        Margin="0,0,8,0"/>
+                                        Margin="0,0,8,0"
+                                        Visibility="{Binding CanEditSelectedUser, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                                 <Button Content="LÖSCHEN"
                                         Style="{StaticResource MaterialDesignOutlinedButton}"
                                         Command="{Binding DeleteBenutzerCommand}"
-                                        CommandParameter="{Binding SelectedBenutzer}"/>
+                                        CommandParameter="{Binding SelectedBenutzer}"
+                                        Visibility="{Binding CanEditSelectedUser, Converter={StaticResource BooleanToVisibilityConverter}}"/>
                             </StackPanel>
                         </StackPanel>
                     </StackPanel>

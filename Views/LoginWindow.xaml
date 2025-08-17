@@ -145,7 +145,7 @@
                 <StackPanel Orientation="Horizontal"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Center">
-                    <TextBlock Text="Demo Benutzer: admin/manager/employee | Passwort: password"
+                    <TextBlock Text="© 2024 Bauverwaltungssystem - Alle Rechte vorbehalten"
                               FontSize="10"
                               Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                 </StackPanel>

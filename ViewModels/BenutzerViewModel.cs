@@ -15,8 +15,19 @@ namespace ModernWPFApp.ViewModels
         [ObservableProperty]
         private ObservableCollection<User> _filteredBenutzer = new();
 
-        [ObservableProperty]
         private User? _selectedBenutzer;
+        public User? SelectedBenutzer
+        {
+            get => _selectedBenutzer;
+            set
+            {
+                _selectedBenutzer = value;
+                OnPropertyChanged(nameof(SelectedBenutzer));
+                
+                // Update can edit property based on whether selected user can be edited/deleted
+                CanEditSelectedUser = value != null && CanDeleteUser(value);
+            }
+        }
 
         [ObservableProperty]
         private string _searchText = string.Empty;
@@ -30,8 +41,38 @@ namespace ModernWPFApp.ViewModels
         [ObservableProperty]
         private bool _isBenutzerSelected = false;
 
+        [ObservableProperty]
+        private bool _isAdmin = false;
+
+        [ObservableProperty]
+        private bool _canEditSelectedUser = false;
+
+        private bool CanDeleteUser(User user)
+        {
+            var currentUser = AuthenticationService.Instance.CurrentUser;
+            if (currentUser == null || user == null) return false;
+            
+            // System administrators can delete anyone except themselves
+            if (currentUser.Role == UserRole.SystemAdministrator)
+            {
+                return user.Id != currentUser.Id;
+            }
+            
+            // Regular administrators can delete anyone except SystemAdministrators and themselves
+            if (currentUser.Role == UserRole.Administrator)
+            {
+                return user.Role != UserRole.SystemAdministrator && user.Id != currentUser.Id;
+            }
+            
+            return false;
+        }
+
         public BenutzerViewModel()
         {
+            // Check if current user is admin or system admin
+            var authService = AuthenticationService.Instance;
+            IsAdmin = authService.CurrentUser?.Role == UserRole.Administrator || authService.CurrentUser?.Role == UserRole.SystemAdministrator;
+            
             _ = LoadSampleData();
             
             // Subscribe to SelectedBenutzer changes to update IsBenutzerSelected
@@ -74,6 +115,12 @@ namespace ModernWPFApp.ViewModels
         [RelayCommand]
         private async Task AddBenutzer()
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Nur Administratoren können neue Benutzer hinzufügen.", "Zugriff verweigert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             try
             {
                 var editViewModel = new BenutzerEditViewModel();
@@ -125,10 +172,33 @@ namespace ModernWPFApp.ViewModels
         [RelayCommand]
         private async Task EditBenutzer(User? benutzer = null)
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Nur Administratoren können Benutzer bearbeiten.", "Zugriff verweigert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var benutzerToEdit = benutzer ?? SelectedBenutzer;
             if (benutzerToEdit == null)
             {
                 MessageBox.Show("Bitte wählen Sie einen Benutzer aus.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Check if user can be edited
+            var currentUser = AuthenticationService.Instance.CurrentUser;
+            if (currentUser != null && benutzerToEdit.Id == currentUser.Id)
+            {
+                MessageBox.Show("Sie können Ihr eigenes Konto nicht bearbeiten.\n\nBitte lassen Sie sich von einem anderen Administrator bearbeiten.", 
+                               "Bearbeitung nicht erlaubt", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            
+            // Regular administrators cannot edit SystemAdministrators
+            if (currentUser?.Role == UserRole.Administrator && benutzerToEdit.Role == UserRole.SystemAdministrator)
+            {
+                MessageBox.Show("Sie können Systemadministratoren nicht bearbeiten.\n\nNur Systemadministratoren können andere Systemadministratoren verwalten.", 
+                               "Bearbeitung nicht erlaubt", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -183,10 +253,33 @@ namespace ModernWPFApp.ViewModels
         [RelayCommand]
         private async Task DeleteBenutzer(User? benutzer = null)
         {
+            if (!IsAdmin)
+            {
+                MessageBox.Show("Nur Administratoren können Benutzer löschen.", "Zugriff verweigert", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             var benutzerToDelete = benutzer ?? SelectedBenutzer;
             if (benutzerToDelete == null)
             {
                 MessageBox.Show("Bitte wählen Sie einen Benutzer aus.", "Hinweis", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Check if user can be deleted
+            if (!CanDeleteUser(benutzerToDelete))
+            {
+                var currentUser = AuthenticationService.Instance.CurrentUser;
+                if (currentUser != null && benutzerToDelete.Id == currentUser.Id)
+                {
+                    MessageBox.Show("Sie können Ihr eigenes Konto nicht löschen.\n\nBitte lassen Sie sich von einem anderen Administrator löschen.", 
+                                   "Löschen nicht erlaubt", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+                else if (benutzerToDelete.Role == UserRole.SystemAdministrator)
+                {
+                    MessageBox.Show("Systemadministratoren können nicht gelöscht werden.\n\nNur Systemadministratoren können andere Systemadministratoren verwalten.", 
+                                   "Löschen nicht erlaubt", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
                 return;
             }
 
